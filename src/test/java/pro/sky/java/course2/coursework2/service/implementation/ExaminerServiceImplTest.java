@@ -11,6 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import pro.sky.java.course2.coursework2.exceptions.BadRequestException;
+import pro.sky.java.course2.coursework2.exceptions.NullQuestionsInRepo;
 import pro.sky.java.course2.coursework2.items.Question;
 import pro.sky.java.course2.coursework2.service.ExaminerService;
 import pro.sky.java.course2.coursework2.service.QuestionService;
@@ -66,9 +67,16 @@ class ExaminerServiceImplTest {
     }
 
     @Test
-    void nullQuestionBehaviorTest() {
+    void nullLoopBehaviorTest() {
         when(questionServiceMock.getSize()).thenReturn(1);
         when(questionServiceMock.getRandomQuestion()).thenReturn(null);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> examinerService.getQuestions(1));
+        Assertions.assertThrows(NullQuestionsInRepo.class, () -> examinerService.getQuestions(1));
+    }
+
+    @Test
+    void nullQuestionTryAgainTest() {
+        when(questionServiceMock.getSize()).thenReturn(1);
+        when(questionServiceMock.getRandomQuestion()).thenReturn(null).thenReturn(null).thenReturn(testQuestion);
+        Assertions.assertIterableEquals(questions, examinerService.getQuestions(1));
     }
 }

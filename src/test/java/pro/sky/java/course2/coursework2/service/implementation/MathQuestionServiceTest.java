@@ -30,10 +30,6 @@ class MathQuestionServiceTest {
     String answer = "Bar";
     Collection<Question> questions = new TreeSet<Question>(Set.of(test, test2, new Question("A", "BE")));
 
-    @BeforeEach
-    void setUp() {
-
-    }
 
     @Test
     void add() {

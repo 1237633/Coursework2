@@ -5,6 +5,7 @@ import org.springframework.beans.NullValueInNestedPathException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import pro.sky.java.course2.coursework2.exceptions.BadRequestException;
+import pro.sky.java.course2.coursework2.exceptions.NullQuestionsInRepo;
 import pro.sky.java.course2.coursework2.items.Question;
 import pro.sky.java.course2.coursework2.service.ExaminerService;
 import pro.sky.java.course2.coursework2.service.QuestionRepository;
@@ -18,11 +19,13 @@ public class ExaminerServiceImpl implements ExaminerService {
     private QuestionService java;
     private QuestionService math;
     private Random random;
+    int iterator;
 
     public ExaminerServiceImpl(@Qualifier("JQS") QuestionService java, @Qualifier("MQS") QuestionService math) {
         this.java = java;
         this.math = math;
         this.random = new Random();
+        this.iterator = 0;
     }
 
 
@@ -40,23 +43,30 @@ public class ExaminerServiceImpl implements ExaminerService {
 
             switch (random.nextInt(2)) {
                 case 0:
-                    q = java.getRandomQuestion();
-                    if (q == null) {
-                        throw new IllegalArgumentException("Question can't be null!");
-                    }
-                    result.add(q);
+                    result.add(getQuestion(java));
                     break;
 
                 case 1:
-                    q = math.getRandomQuestion();
-                    if (q == null) {
-                        throw new IllegalArgumentException("Question can't be null!");
-                    }
-                    result.add(q);
+                    result.add(getQuestion(math));
                     break;
             }
         }
 
         return result;
+    }
+
+    private Question getQuestion(QuestionService questionService) {
+        Question question = questionService.getRandomQuestion();
+        if (question == null) {
+            iterator++;
+            if (iterator < 10) {
+                System.err.println("Got null question. Trying again");
+                return getQuestion(questionService);
+            } else {
+                throw new NullQuestionsInRepo("Too much null questions detected in " + questionService + " repository");
+            }
+        }
+        iterator = 0;
+        return question;
     }
 }
