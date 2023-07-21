@@ -1,25 +1,22 @@
 package pro.sky.java.course2.coursework2.service.implementation;
 
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import pro.sky.java.course2.coursework2.exceptions.BadRequestException;
 import pro.sky.java.course2.coursework2.items.Question;
 import pro.sky.java.course2.coursework2.service.QuestionRepository;
 import pro.sky.java.course2.coursework2.service.QuestionService;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Random;
 import java.util.stream.Collectors;
-
-
 @Service
-@Qualifier("JQS")
-public class JavaQuestionService implements QuestionService {
-
+@Qualifier("MQS")
+public class MathQuestionService implements QuestionService {
     private Random random;
     private QuestionRepository questionRepository;
 
-    public JavaQuestionService(@Qualifier("JQR") QuestionRepository questionRepository) {
+    public MathQuestionService(@Qualifier("MQR") QuestionRepository questionRepository) {
         this.questionRepository = questionRepository;
         this.random = new Random();
     }
@@ -64,5 +61,4 @@ public class JavaQuestionService implements QuestionService {
     public int getSize() {
         return questionRepository.getSize();
     }
-
 }

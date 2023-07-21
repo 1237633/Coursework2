@@ -3,6 +3,10 @@ package pro.sky.java.course2.coursework2.service.implementation;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import pro.sky.java.course2.coursework2.exceptions.BadRequestException;
 import pro.sky.java.course2.coursework2.items.Question;
 
@@ -10,59 +14,48 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.TreeSet;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class JavaQuestionServiceTest {
-
+    @Mock
+    JavaQuestionRepository javaQuestionRepositoryMock;
+    @InjectMocks
     JavaQuestionService javaQuestionService;
+
+    Question test = new Question("Foo", "Bar");
+    Question test2 = new Question("Bar", "Foo");
+    String question = "Foo";
+    String answer = "Bar";
+    Collection<Question> questions = new TreeSet<Question>(Set.of(test, test2, new Question("A", "BE")));
 
     @BeforeEach
     void setUp() {
-        javaQuestionService = new JavaQuestionService(new TreeSet<Question>());
+
     }
 
     @Test
     void add() {
-        javaQuestionService.add("Kupi slona!", "Nyet!");
-        Set<Question> expected = new TreeSet<Question>();
-        expected.add(new Question("Kupi slona!", "Nyet!"));
-        Assertions.assertIterableEquals(expected, javaQuestionService.getAll());
+        when(javaQuestionRepositoryMock.add(question, answer)).thenReturn(test);
+        Assertions.assertEquals(test, javaQuestionService.add(question, answer));
     }
 
     @Test
     void addQ() {
-        Question test = new Question("a", "be");
-        javaQuestionService.add(test);
-        Set<Question> expected = new TreeSet<Question>();
-        expected.add(test);
-        Assertions.assertIterableEquals(expected, javaQuestionService.getAll());
+        when(javaQuestionRepositoryMock.add(test)).thenReturn(test);
+        Assertions.assertEquals(test, javaQuestionService.add(test));
     }
 
     @Test
     void remove() {
-        Question test = new Question("foo", "foo");
-        Question test2 = new Question("bar", "bar");
-
-        javaQuestionService.add(test);
-        javaQuestionService.add(test2);
-        javaQuestionService.remove(test2);
-
-        Set<Question> expected = new TreeSet<Question>();
-        expected.add(test);
-        Assertions.assertIterableEquals(expected, javaQuestionService.getAll());
+        when(javaQuestionRepositoryMock.remove(test)).thenReturn(test);
+        Assertions.assertEquals(test, javaQuestionService.remove(test));
     }
 
     @Test
     void getAll() {
-        Question test = new Question("foo", "foo");
-        Question test2 = new Question("bar", "bar");
-
-        javaQuestionService.add(test);
-        javaQuestionService.add(test2);
-
-        Collection<Question> expected = new TreeSet<Question>();
-        expected.add(test2);
-        expected.add(test);
+        when(javaQuestionRepositoryMock.getAll()).thenReturn(new TreeSet<Question>(Set.of(test, test2)));
+        Collection<Question> expected = new TreeSet<Question>(Set.of(test2, test));
 
         Assertions.assertIterableEquals(expected, javaQuestionService.getAll());
 
@@ -71,61 +64,20 @@ class JavaQuestionServiceTest {
 
     @Test
     void getRandomQuestion() {
-        Question test = new Question("foo", "foo");
-        Question test2 = new Question("bar", "bar");
-
-        javaQuestionService.add(test);
-        javaQuestionService.add(test2);
+        when(javaQuestionRepositoryMock.getSize()).thenReturn(2);
+        when(javaQuestionRepositoryMock.getAll()).thenReturn(questions);
 
         Question actual = javaQuestionService.getRandomQuestion();
-        Question expected = javaQuestionService.get(actual.getQuestion());
 
-        Assertions.assertEquals(expected, actual);
+        Assertions.assertTrue(javaQuestionRepositoryMock.getAll().contains(actual));
 
     }
 
     @Test
     void get() {
-        Question expected = new Question("foo", "bar");
+        when(javaQuestionRepositoryMock.getAll()).thenReturn(questions);
+        Assertions.assertEquals(test, javaQuestionService.get(question));
 
-        javaQuestionService.add(expected);
-
-        Assertions.assertEquals(expected, javaQuestionService.get("foo"));
-
-    }
-
-    @Test
-    void getSize() {
-        Question test = new Question("foo", "foo");
-        Question test2 = new Question("bar", "bar");
-
-        javaQuestionService.add(test);
-        javaQuestionService.add(test2);
-
-        Assertions.assertEquals(2, javaQuestionService.getSize());
-    }
-
-    @Test
-    void addThrowsExceptionAtNullQA() {
-        String testStr = null;
-        Assertions.assertThrows(IllegalArgumentException.class, () -> javaQuestionService.add(testStr, "foo"));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> javaQuestionService.add("foo", null));
-    }
-
-    @Test
-    void addThrowsExceptionAtNull() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> javaQuestionService.add(null));
-    }
-
-    @Test
-    void removeThrowsExceptionAtNull() {
-        javaQuestionService.add(new Question("foo", "bar"));
-        Assertions.assertThrows(IllegalArgumentException.class, () -> javaQuestionService.remove(null));
-    }
-
-    @Test
-    void getAllThrowsExceptionIfEmpty() {
-        Assertions.assertThrows(BadRequestException.class, () -> javaQuestionService.getAll());
     }
 
     @Test

@@ -11,12 +11,12 @@ import pro.sky.java.course2.coursework2.service.QuestionService;
 import java.util.Collection;
 
 @RestController
-@RequestMapping("/exam/java/")
-public class JavaQuestionController {
+@RequestMapping("/exam/math/")
+public class MathQuestionController {
 
     QuestionService questionService;
 
-    public JavaQuestionController(@Qualifier("JQS") QuestionService questionService) {
+    public MathQuestionController(@Qualifier("MQS") QuestionService questionService) {
         this.questionService = questionService;
     }
 
@@ -35,5 +35,4 @@ public class JavaQuestionController {
     public Question removeQuestion(@RequestParam String questionText) {
         return questionService.remove(questionService.get(questionText));
     }
-
 }

@@ -1,3 +1,4 @@
+
 package pro.sky.java.course2.coursework2.service.implementation;
 
 import org.junit.jupiter.api.Assertions;
@@ -12,6 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import pro.sky.java.course2.coursework2.exceptions.BadRequestException;
 import pro.sky.java.course2.coursework2.items.Question;
 import pro.sky.java.course2.coursework2.service.ExaminerService;
+import pro.sky.java.course2.coursework2.service.QuestionService;
 
 import java.util.*;
 
@@ -30,8 +32,7 @@ class ExaminerServiceImplTest {
     private Collection<Question> questions;
 
     @Mock
-    private JavaQuestionService javaQuestionServiceMock;
-
+    private QuestionService questionServiceMock;
     @InjectMocks
     private ExaminerServiceImpl examinerService;
 
@@ -45,8 +46,8 @@ class ExaminerServiceImplTest {
 
     @Test
     void getOneQuestion() {
-        when(javaQuestionServiceMock.getSize()).thenReturn(1);
-        when(javaQuestionServiceMock.getRandomQuestion()).thenReturn(testQuestion);
+        when(questionServiceMock.getSize()).thenReturn(1);
+        when(questionServiceMock.getRandomQuestion()).thenReturn(testQuestion);
         Assertions.assertIterableEquals(questions, examinerService.getQuestions(1));
 
     }
@@ -54,8 +55,8 @@ class ExaminerServiceImplTest {
     @Test
     void getQuestions() {
         questions.add(testQuestion2);
-        when(javaQuestionServiceMock.getSize()).thenReturn(5);
-        when(javaQuestionServiceMock.getRandomQuestion()).thenReturn(testQuestion).thenReturn(testQuestion2);
+        when(questionServiceMock.getSize()).thenReturn(5);
+        when(questionServiceMock.getRandomQuestion()).thenReturn(testQuestion).thenReturn(testQuestion2);
         Assertions.assertTrue(questions.containsAll(examinerService.getQuestions(2)));
     }
 
@@ -66,8 +67,8 @@ class ExaminerServiceImplTest {
 
     @Test
     void nullQuestionBehaviorTest() {
-        when(javaQuestionServiceMock.getSize()).thenReturn(1);
-        when(javaQuestionServiceMock.getRandomQuestion()).thenReturn(null);
+        when(questionServiceMock.getSize()).thenReturn(1);
+        when(questionServiceMock.getRandomQuestion()).thenReturn(null);
         Assertions.assertThrows(IllegalArgumentException.class, () -> examinerService.getQuestions(1));
     }
 }
