@@ -11,7 +11,6 @@ public interface QuestionService {
     Collection<Question> getAll();
     Question getRandomQuestion();
     Question get(String questionText);
-
     int getSize();
 
 

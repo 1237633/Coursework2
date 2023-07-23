@@ -1,64 +1,87 @@
 package pro.sky.java.course2.coursework2.service.implementation;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpMethod;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.MethodNotAllowedException;
 import pro.sky.java.course2.coursework2.exceptions.BadRequestException;
 import pro.sky.java.course2.coursework2.items.Question;
 import pro.sky.java.course2.coursework2.service.QuestionRepository;
 import pro.sky.java.course2.coursework2.service.QuestionService;
 
-import java.util.Collection;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
+
 @Service
+@Component
 @Qualifier("MQS")
 public class MathQuestionService implements QuestionService {
     private Random random;
-    private QuestionRepository questionRepository;
+    private final char[] symbols = {'+', '-', '*', '/'};
 
-    public MathQuestionService(@Qualifier("MQR") QuestionRepository questionRepository) {
-        this.questionRepository = questionRepository;
+    public MathQuestionService() {
         this.random = new Random();
     }
 
     @Override
     public Question add(String question, String answer) {
-        return questionRepository.add(question, answer);
+        throw new MethodNotAllowedException("add", null);
     }
 
     @Override
     public Question add(Question question) {
-        return questionRepository.add(question);
+        throw new MethodNotAllowedException("add", null);
     }
 
     @Override
     public Question remove(Question question) {
-        return questionRepository.remove(question);
+        throw new MethodNotAllowedException("remove", null);
     }
 
     @Override
     public Collection<Question> getAll() {
-        return questionRepository.getAll();
+        throw new MethodNotAllowedException("getAll", null);
     }
 
     @Override
     public Question getRandomQuestion() {
-        if (questionRepository.getSize() < 1) {
-            throw new BadRequestException("No questions yet!");
+        double[] operands = {generateNumber(), generateNumber()};
+        int operation = random.nextInt(symbols.length);
+        double result = 0;
+        String question = operands[0] + " " + symbols[operation] + " " + operands[1];
+
+        switch (operation) {
+            case 0:
+                result = operands[0] + operands[1];
+                break;
+            case 1:
+                result = operands[0] - operands[1];
+                break;
+            case 2:
+                result = operands[0] * operands[1];
+                break;
+            case 3:
+                result = operands[0]/operands[1];
+                break;
         }
-        return questionRepository.getAll().stream().collect(Collectors.toList()).get(random.nextInt(questionRepository.getSize()));
+        String answer = String.format("%.3f", result);
+        return new Question(question, answer);
+    }
+
+    private int generateNumber() {
+        return random.nextInt(1000); //only 3-digit
     }
 
     @Override
     public Question get(String questionText) {
-        if (questionText == null) {
-            throw new IllegalArgumentException("Question can't be null");
-        }
-        return questionRepository.getAll().stream().filter(question -> question.getQuestion().equals(questionText)).findFirst().get();
+        throw new MethodNotAllowedException("get", null);
     }
 
     @Override
     public int getSize() {
-        return questionRepository.getSize();
+        throw new MethodNotAllowedException("getSize", null);
     }
 }
+
+

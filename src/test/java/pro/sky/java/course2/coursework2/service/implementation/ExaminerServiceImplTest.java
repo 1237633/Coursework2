@@ -10,6 +10,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import pro.sky.java.course2.coursework2.exceptions.BadRequestException;
 import pro.sky.java.course2.coursework2.exceptions.NullQuestionsInRepo;
 import pro.sky.java.course2.coursework2.items.Question;
@@ -31,52 +32,60 @@ class ExaminerServiceImplTest {
     private Question testQuestion;
     private Question testQuestion2;
     private Collection<Question> questions;
+    private int amount = 2;
+
 
     @Mock
-    private QuestionService questionServiceMock;
+    private List<QuestionService> questionServiceListMock;
+    @Mock
+    private JavaQuestionService javaQuestionServiceMock;
+
     @InjectMocks
     private ExaminerServiceImpl examinerService;
 
+
     @BeforeEach
     void setUp() {
-        questions = new HashSet<Question>();
         testQuestion = new Question("foo", "bar");
         testQuestion2 = new Question("bar", "foo");
+        questions = new HashSet<Question>();
         questions.add(testQuestion);
+
+        when(questionServiceListMock.size()).thenReturn(2);
+        when(questionServiceListMock.get(anyInt())).thenReturn(javaQuestionServiceMock);
+        when(javaQuestionServiceMock.getRandomQuestion()).thenReturn(testQuestion).thenReturn(testQuestion2);
     }
 
     @Test
     void getOneQuestion() {
-        when(questionServiceMock.getSize()).thenReturn(1);
-        when(questionServiceMock.getRandomQuestion()).thenReturn(testQuestion);
         Assertions.assertIterableEquals(questions, examinerService.getQuestions(1));
+    }
 
+    @Test
+    void getQuestionsSize() {
+
+        questions.add(testQuestion2);
+        Assertions.assertEquals(amount, examinerService.getQuestions(amount).size());
     }
 
     @Test
     void getQuestions() {
-        questions.add(testQuestion2);
-        when(questionServiceMock.getSize()).thenReturn(5);
-        when(questionServiceMock.getRandomQuestion()).thenReturn(testQuestion).thenReturn(testQuestion2);
-        Assertions.assertTrue(questions.containsAll(examinerService.getQuestions(2)));
-    }
 
-    @Test
-    void throwsExpectionIfAmountIsTooHigh() {
-        Assertions.assertThrows(BadRequestException.class, () -> examinerService.getQuestions(5));
+        questions.add(testQuestion2);
+        Assertions.assertTrue(questions.containsAll(examinerService.getQuestions(amount)));
     }
 
     @Test
     void nullLoopBehaviorTest() {
-        when(questionServiceMock.getSize()).thenReturn(1);
-        when(questionServiceMock.getRandomQuestion()).thenReturn(null);
+        when(javaQuestionServiceMock.getRandomQuestion()).thenReturn(null);
         Assertions.assertThrows(NullQuestionsInRepo.class, () -> examinerService.getQuestions(1));
     }
 
     @Test
     void nullQuestionTryAgainTest() {
-        when(questionServiceMock.getSize()).thenReturn(1);
-        when(questionServiceMock.getRandomQuestion()).thenReturn(null).thenReturn(null).thenReturn(testQuestion);
-        Assertions.assertIterableEquals(questions, examinerService.getQuestions(1));
+
+        questions.add(testQuestion2);
+        when(javaQuestionServiceMock.getRandomQuestion()).thenReturn(testQuestion).thenReturn(null).thenReturn(testQuestion2);
+        Assertions.assertTrue(questions.containsAll(examinerService.getQuestions(amount)));
     }
 }
