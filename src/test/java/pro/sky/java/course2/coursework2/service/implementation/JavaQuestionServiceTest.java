@@ -54,8 +54,6 @@ class JavaQuestionServiceTest {
         Collection<Question> expected = new TreeSet<Question>(Set.of(test2, test));
 
         Assertions.assertIterableEquals(expected, javaQuestionService.getAll());
-
-
     }
 
     @Test
@@ -66,14 +64,12 @@ class JavaQuestionServiceTest {
         Question actual = javaQuestionService.getRandomQuestion();
 
         Assertions.assertTrue(javaQuestionRepositoryMock.getAll().contains(actual));
-
     }
 
     @Test
     void get() {
         when(javaQuestionRepositoryMock.getAll()).thenReturn(questions);
         Assertions.assertEquals(test, javaQuestionService.get(question));
-
     }
 
     @Test
@@ -84,6 +80,12 @@ class JavaQuestionServiceTest {
     @Test
     void getRandomThrowsExceptionIfEmpty() {
         Assertions.assertThrows(BadRequestException.class, () -> javaQuestionService.getRandomQuestion());
+    }
+
+    @Test
+    void getUnexistingQuestion() {
+        when(javaQuestionRepositoryMock.getAll()).thenReturn(questions);
+        Assertions.assertThrows(BadRequestException.class, () -> javaQuestionService.get("ASD"));
     }
 
 

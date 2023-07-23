@@ -1,6 +1,7 @@
 package pro.sky.java.course2.coursework2.service.implementation;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import pro.sky.java.course2.coursework2.exceptions.BadRequestException;
@@ -13,6 +14,7 @@ import java.util.stream.Collectors;
 
 
 @Service
+@Component
 @Qualifier("JQS")
 public class JavaQuestionService implements QuestionService {
 
@@ -47,7 +49,7 @@ public class JavaQuestionService implements QuestionService {
     @Override
     public Question getRandomQuestion() {
         if (questionRepository.getSize() < 1) {
-            throw new BadRequestException("No questions yet!");
+            throw new BadRequestException("No Java Questions Yet!");
         }
         return questionRepository.getAll().stream().collect(Collectors.toList()).get(random.nextInt(questionRepository.getSize()));
     }
@@ -57,7 +59,7 @@ public class JavaQuestionService implements QuestionService {
         if (questionText == null) {
             throw new IllegalArgumentException("Question can't be null");
         }
-        return questionRepository.getAll().stream().filter(question -> question.getQuestion().equals(questionText)).findFirst().get();
+        return questionRepository.getAll().stream().filter(question -> question.getQuestion().equals(questionText)).findFirst().orElseThrow(() ->new BadRequestException("No such question"));
     }
 
     @Override

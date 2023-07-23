@@ -7,6 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.server.MethodNotAllowedException;
 import pro.sky.java.course2.coursework2.exceptions.BadRequestException;
 import pro.sky.java.course2.coursework2.items.Question;
 
@@ -19,9 +21,7 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class MathQuestionServiceTest {
-    @Mock
-    MathQuestionRepository mathQuestionRepositoryMock;
-    @InjectMocks
+
     MathQuestionService mathQuestionService;
 
     Question test = new Question("Foo", "Bar");
@@ -31,60 +31,40 @@ class MathQuestionServiceTest {
     Collection<Question> questions = new TreeSet<Question>(Set.of(test, test2, new Question("A", "BE")));
 
 
+    public MathQuestionServiceTest() {
+        this.mathQuestionService = new MathQuestionService();
+    }
+
     @Test
     void add() {
-        when(mathQuestionRepositoryMock.add(question, answer)).thenReturn(test);
-        Assertions.assertEquals(test, mathQuestionService.add(question, answer));
+        Assertions.assertThrows(MethodNotAllowedException.class, () -> mathQuestionService.add(test));
     }
 
     @Test
     void addQ() {
-        when(mathQuestionRepositoryMock.add(test)).thenReturn(test);
-        Assertions.assertEquals(test, mathQuestionService.add(test));
+        Assertions.assertThrows(MethodNotAllowedException.class, () -> mathQuestionService.add(question, answer));
     }
 
     @Test
     void remove() {
-        when(mathQuestionRepositoryMock.remove(test)).thenReturn(test);
-        Assertions.assertEquals(test, mathQuestionService.remove(test));
+        Assertions.assertThrows(MethodNotAllowedException.class, () -> mathQuestionService.remove(test));
     }
 
     @Test
     void getAll() {
-        when(mathQuestionRepositoryMock.getAll()).thenReturn(new TreeSet<Question>(Set.of(test, test2)));
-        Collection<Question> expected = new TreeSet<Question>(Set.of(test2, test));
-
-        Assertions.assertIterableEquals(expected, mathQuestionService.getAll());
-
-
+        Assertions.assertThrows(MethodNotAllowedException.class, () -> mathQuestionService.getAll());
     }
 
     @Test
     void getRandomQuestion() {
-        when(mathQuestionRepositoryMock.getSize()).thenReturn(2);
-        when(mathQuestionRepositoryMock.getAll()).thenReturn(questions);
-
-        Question actual = mathQuestionService.getRandomQuestion();
-
-        Assertions.assertTrue(mathQuestionRepositoryMock.getAll().contains(actual));
-
+        System.out.println(mathQuestionService.getRandomQuestion());
+        Assertions.assertInstanceOf(Question.class, mathQuestionService.getRandomQuestion());
     }
 
     @Test
     void get() {
-        when(mathQuestionRepositoryMock.getAll()).thenReturn(questions);
-        Assertions.assertEquals(test, mathQuestionService.get(question));
+        Assertions.assertThrows(MethodNotAllowedException.class, () -> mathQuestionService.get(question));;
 
-    }
-
-    @Test
-    void getThrowsExceptionAtNull() {
-        Assertions.assertThrows(IllegalArgumentException.class, () -> mathQuestionService.get(null));
-    }
-
-    @Test
-    void getRandomThrowsExceptionIfEmpty() {
-        Assertions.assertThrows(BadRequestException.class, () -> mathQuestionService.getRandomQuestion());
     }
 
 }
